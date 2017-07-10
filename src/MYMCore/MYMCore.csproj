@@ -62,9 +62,16 @@
     <Compile Include="Behavioral\Validation.cs" />
     <Compile Include="Creational\IInitializable.cs" />
     <Compile Include="Creational\SingletonBase.cs" />
+    <Compile Include="Extensions\CSVMemberAttribute.cs" />
+    <Compile Include="Extensions\FieldMappingAttribute.cs" />
+    <Compile Include="Extensions\IEnumberableExtensions.cs" />
     <Compile Include="Extensions\NameValueCollectionExtensions.cs" />
+    <Compile Include="Extensions\ObjectExtensions.cs" />
+    <Compile Include="Extensions\PropertyExtensions.cs" />
     <Compile Include="Extensions\ServiceProviderExtensions.cs" />
     <Compile Include="Extensions\StringBuilderExtensions.cs" />
+    <Compile Include="Extensions\TypeExtensions.cs" />
+    <Compile Include="Net\Mail\Extensions\EmailAddressExtensions.cs" />
     <Compile Include="Net\Mail\SMTPClientSending.cs" />
     <Compile Include="Net\Mail\CredentialType.cs" />
     <Compile Include="Net\Mail\Email.cs" />
