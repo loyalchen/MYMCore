@@ -71,6 +71,7 @@
     <Compile Include="Extensions\ServiceProviderExtensions.cs" />
     <Compile Include="Extensions\StringBuilderExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
+    <Compile Include="MVVM\BindableBase.cs" />
     <Compile Include="Net\Mail\Extensions\EmailAddressExtensions.cs" />
     <Compile Include="Net\Mail\SMTPClientSending.cs" />
     <Compile Include="Net\Mail\CredentialType.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="Net\Mail\IClientSending.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
