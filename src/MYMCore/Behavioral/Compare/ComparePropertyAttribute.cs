@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MYMCore.Behavioral.Compare {
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = true)]
+    /// <summary>
+    /// Indicates the property of filed should be campared.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class ComparePropertyAttribute: Attribute {
-
     }
 }

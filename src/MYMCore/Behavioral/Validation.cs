@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
 
 namespace MYMCore.Behavioral {
     public class Validation {
@@ -14,8 +11,9 @@ namespace MYMCore.Behavioral {
         }
 
         public static bool IsValidateProperty<T>(T t, string field, object validateValue, out List<ValidationResult> result) {
-            var content = new ValidationContext(t);
-            content.MemberName = field;
+            var content = new ValidationContext(t) {
+                MemberName = field
+            };
             result = new List<ValidationResult>();
             return Validator.TryValidateProperty(validateValue, content, result);
         }

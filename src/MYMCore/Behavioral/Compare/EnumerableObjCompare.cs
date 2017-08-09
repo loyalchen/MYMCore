@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MYMCore.Behavioral.Compare {
     public class EnumerableObjCompare<T> : ObjCompare
         where T : ComparableModel, new() {
-        private Dictionary<int, string> _originalVersion;
-        private Dictionary<int, bool> _originalLCV;
+        private readonly Dictionary<int, string> _originalVersion;
+        private readonly Dictionary<int, bool> _originalLCV;
         private readonly BindingFlags _bindingFlags = BindingFlags.Public | BindingFlags.Instance;
 
         public EnumerableObjCompare() {
@@ -36,14 +34,15 @@ namespace MYMCore.Behavioral.Compare {
         /// Item2: Delete
         /// Item3: Update
         /// </summary>
-        /// <param name="dataSource"></param>
+        /// <param name="dataSource">The collection need to be compared with original.</param>
         /// <returns></returns>
         public Tuple<IEnumerable<T>, IEnumerable<T>, IEnumerable<T>> AnalyseBatchChange(IEnumerable<T> dataSource) {
             var newRecords = new List<T>();
             var deleteRecords = new List<T>();
             var modifyRecords = new List<T>();
 
-            foreach (var item in dataSource) {
+            var dsList = dataSource as IList<T> ?? dataSource.ToList();
+            foreach (var item in dsList) {
                 if (item.Id < 0) {
                     newRecords.Add(item);
                     continue;
@@ -57,17 +56,21 @@ namespace MYMCore.Behavioral.Compare {
                 }
             }
 
-            foreach (var item in _originalVersion) {
-                if (!dataSource.Any(c => c.Id == item.Key)) {
-                    var unused = new T();
-                    unused.LCV = true;
-                    unused.Id = item.Key;
-                    deleteRecords.Add(unused);
-                }
-            }
+            deleteRecords.AddRange(from item in _originalVersion
+                where dsList.All(c => c.Id != item.Key)
+                select new T
+                {
+                    LCV = true,
+                    Id = item.Key
+                });
             return Tuple.Create<IEnumerable<T>, IEnumerable<T>, IEnumerable<T>>(newRecords, deleteRecords, modifyRecords);
         }
 
+        /// <summary>
+        /// Get the change data compared with origianl data.
+        /// </summary>
+        /// <param name="dataSource">The collection need to be compared with original.</param>
+        /// <returns>The change details list.</returns>
         public IEnumerable<T> AnalyseChange(IEnumerable<T> dataSource) {
             var data = AnalyseBatchChange(dataSource);
             var result = new List<T>();

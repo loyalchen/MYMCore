@@ -6,6 +6,13 @@ using System.Text;
 
 namespace MYMCore.Behavioral.Compare {
     public class ObjCompare {
+        /// <summary>
+        /// Get the Base64String of specified object with specified <see cref="BindingFlags"/> properties and fileds.
+        /// The properties and fields need the <seealso cref="ComparePropertyAttribute"/> to be applied.
+        /// </summary>
+        /// <param name="obj">The object to be convert to Base64String.</param>
+        /// <param name="bindingFlags">The flags for properties and fields.</param>
+        /// <returns>An Base64String convert form specified object.</returns>
         public static string AnalyseOriginalVersion(object obj, BindingFlags bindingFlags) {
             var comparedValues = new StringBuilder();
             var props = obj.GetType().GetProperties(bindingFlags);
@@ -16,7 +23,7 @@ namespace MYMCore.Behavioral.Compare {
                 if (propertyValue == null) {
                     continue;
                 }
-                if (item.GetCustomAttributes<ComparePropertyAttribute>(true).Count() == 0) {
+                if (!item.GetCustomAttributes<ComparePropertyAttribute>(true).Any()) {
                     continue;
                 }
                 if (item.PropertyType.IsPrimitive || item.PropertyType.IsValueType || item.PropertyType == typeof(string) || item.PropertyType == typeof(DateTime)) {
@@ -32,7 +39,7 @@ namespace MYMCore.Behavioral.Compare {
                 if (fieldValue == null) {
                     continue;
                 }
-                if (item.GetCustomAttributes<ComparePropertyAttribute>(true).Count() == 0) {
+                if (!item.GetCustomAttributes<ComparePropertyAttribute>(true).Any()) {
                     continue;
                 }
                 if (item.FieldType.IsPrimitive || item.FieldType == typeof(string) || item.FieldType == typeof(DateTime)) {
