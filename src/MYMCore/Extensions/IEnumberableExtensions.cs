@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace MYMCore.Extensions {
     public static class IEnumberableExtensions {
@@ -14,14 +13,15 @@ namespace MYMCore.Extensions {
             var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
             var csvInfo = props.Where(c => c.GetCustomAttribute<CSVMemberAttribute>() != null);
 
-            var columnNames = csvInfo.Select(c => c.Name);
+            var propertyInfos = csvInfo as PropertyInfo[] ?? csvInfo.ToArray();
+            var columnNames = propertyInfos.Select(c => c.Name);
 
             sb.AppendLine(string.Join(",", columnNames)); //bulid header
 
-            foreach (T item in source) {
-                var fields = csvInfo.Select(c => {
+            foreach (var item in source) {
+                var fields = propertyInfos.Select(c => {
                     var o = c.GetValue(item);
-                    var value = o != null ? o.ToString() : string.Empty;
+                    var value = o?.ToString() ?? string.Empty;
                     value = string.Concat("\"", value.Replace("\"", "\"\""), "\"");
                     return value;
                 });
@@ -40,20 +40,20 @@ namespace MYMCore.Extensions {
 
             // create data table schema by T
             var props = typeof(T).GetProperties();
-            foreach (PropertyInfo prop in props) {
+            foreach (var prop in props) {
                 FieldMappingAttribute attr;
-                if (prop.TryGetCustomAttribute(out attr)) {
-                    Type t = prop.PropertyType.GetCoreType();
-                    DataColumn dc = tb.Columns.Add(string.IsNullOrEmpty(attr.FieldName) ? prop.Name : attr.FieldName, t);
-                    if (attr.OrderId != 0)
-                        orderList.Add(new KeyValuePair<string, int>(dc.ColumnName, attr.OrderId));
-                    else
-                        defaultList.Add(new KeyValuePair<string, int>(dc.ColumnName, dc.Ordinal));
+                if (!prop.TryGetCustomAttribute(out attr)) {
+                    continue;
                 }
+                var dc = tb.Columns.Add(string.IsNullOrEmpty(attr.FieldName) ? prop.Name : attr.FieldName, prop.PropertyType.GetCoreType());
+                if (attr.OrderId != 0)
+                    orderList.Add(new KeyValuePair<string, int>(dc.ColumnName, attr.OrderId));
+                else
+                    defaultList.Add(new KeyValuePair<string, int>(dc.ColumnName, dc.Ordinal));
             }
 
             foreach (var item in defaultList) {
-                int ordinal = item.Value;
+                var ordinal = item.Value;
 
                 KeyValuePair<string, int> temp;
 
@@ -67,30 +67,30 @@ namespace MYMCore.Extensions {
             }
 
             finaltList.AddRange(orderList);
-            int count = 0;
+            var count = 0;
             finaltList = finaltList.OrderBy(c => c.Value).Select(c => new KeyValuePair<string, int>(c.Key, count++)).ToList();
 
-            for (int i = 0; i < finaltList.Count; i++) {
-                KeyValuePair<string, int> kvp = finaltList[i];
+            foreach (var kvp in finaltList) {
                 tb.Columns[kvp.Key].SetOrdinal(kvp.Value);
             }
 
             // set data to data table
-            foreach (T item in collection) {
-                DataRow dr = tb.NewRow();
+            foreach (var item in collection) {
+                var dr = tb.NewRow();
 
-                foreach (PropertyInfo prop in props) {
+                foreach (var prop in props) {
                     FieldMappingAttribute attr;
-                    if (prop.TryGetCustomAttribute(out attr)) {
-                        string fieldName = string.IsNullOrEmpty(attr.FieldName) ? prop.Name : attr.FieldName;
-                        object value = prop.GetValue(item, null);
-
-                        //We need to check whether the property is NULLABLE
-                        if (prop.PropertyType.IsGenericType && prop.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                            dr[fieldName] = value == null ? DBNull.Value : value;
-                        else
-                            dr[fieldName] = value;
+                    if (!prop.TryGetCustomAttribute(out attr)) {
+                        continue;
                     }
+                    var fieldName = string.IsNullOrEmpty(attr.FieldName) ? prop.Name : attr.FieldName;
+                    var value = prop.GetValue(item, null);
+
+                    //We need to check whether the property is NULLABLE
+                    if (prop.IsNullable())
+                        dr[fieldName] = value ?? DBNull.Value;
+                    else
+                        dr[fieldName] = value;
                 }
 
                 tb.Rows.Add(dr);

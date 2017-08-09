@@ -11,16 +11,9 @@ namespace MYMCore.Extensions {
         /// </summary>
         public static Type GetCoreType(this Type t) {
             if (t != null && IsNullable(t)) {
-                if (!t.IsValueType) {
-                    return t;
-                }
-                else {
-                    return Nullable.GetUnderlyingType(t);
-                }
+                return !t.IsValueType ? t : Nullable.GetUnderlyingType(t);
             }
-            else {
-                return t;
-            }
+            return t;
         }
 
         /// <summary>

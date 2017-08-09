@@ -1,12 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MYMCore.Extensions {
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class FieldMappingAttribute : Attribute {
+        public FieldMappingAttribute() {
+                
+        }
+        public FieldMappingAttribute(string fieldName, int orderId) {
+            FieldName = fieldName;
+            OrderId = orderId;
+        }
         public string FieldName { get; set; }
 
         public int OrderId { get; set; }

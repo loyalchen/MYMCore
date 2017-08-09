@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MYMCore.Extensions {
     public static class PropertyExtensions {
@@ -21,13 +18,26 @@ namespace MYMCore.Extensions {
             }
             attr = null;
 
-            var objAttrs = prop.GetCustomAttributes<T>(true);
-            if (objAttrs.Any()) {
-                attr = objAttrs.First();
-
-                return true;
+            var objAttrs = prop.GetCustomAttributes<T>(true).ToList();
+            if (!objAttrs.Any()) {
+                return false;
             }
-            return false;
+            attr = objAttrs.First();
+
+            return true;
+        }
+        /// <summary>
+        /// Gets a value indicating whether the type of current property is nullable.
+        /// </summary>
+        /// <param name="propertyInfo">Current property</param>
+        /// <exception cref="ArgumentNullException">The current property is null.</exception>
+        /// <returns>Ture if the type of current property is nullable;Otherwise false.</returns>
+        public static bool IsNullable(this PropertyInfo propertyInfo) {
+            if (propertyInfo == null) {
+                throw new ArgumentNullException(nameof(propertyInfo));
+            }
+            return propertyInfo.PropertyType.IsGenericType &&
+                   propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
     }
 }

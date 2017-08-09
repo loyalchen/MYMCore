@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MYMCore.Net.Mail {
     public class SMTPClientSending : IClientSending {
-        private SMTPServerConnection _connection;
-        private CredentialType _credentialType;
+        private readonly SMTPServerConnection _connection;
+        private readonly CredentialType _credentialType;
 
         public event EventHandler BeforeConnectingServer;
 
@@ -54,7 +51,7 @@ namespace MYMCore.Net.Mail {
                     catch (Exception e) {
                         ErrorOccuredDuringSeding?.Invoke(this, new EmailErrorEventArgs(item, e));
                         if (ErrorOccuredDuringSeding == null) {
-                            throw e;
+                            throw;
                         }
                     }
                     finally {
@@ -66,13 +63,7 @@ namespace MYMCore.Net.Mail {
         }
 
         private SmtpClient GetSMTPClient() {
-            SmtpClient smtp;
-            if (_connection.Port.HasValue) {
-                smtp = new SmtpClient(_connection.ServerAddress, _connection.Port.Value);
-            }
-            else {
-                smtp = new SmtpClient(_connection.ServerAddress);
-            }
+            var smtp = _connection.Port.HasValue ? new SmtpClient(_connection.ServerAddress, _connection.Port.Value) : new SmtpClient(_connection.ServerAddress);
 
             smtp.EnableSsl = _connection.EnableSSL;
 
